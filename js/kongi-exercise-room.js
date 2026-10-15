@@ -20,6 +20,13 @@ const KongiExerciseRoom = {
   voiceEnabled: true,
   startTime: null,
 
+  // 관절 리그 및 립싱크/시퀀스 상태
+  neckSequenceTimeouts: [],
+  lipSyncInterval: null,
+  blinkInterval: null,
+  isTalking: false,
+  neckCycleCount: 0,
+
   // 8대 의자 체조 기본 마스터 동작 데이터
   masterSteps: {
     prep: {
@@ -33,8 +40,8 @@ const KongiExerciseRoom = {
     neck: {
       name: "목 운동 (좌우 천천히 부드럽게 숙이기)",
       actionTitle: "🌸 2단계: 부드럽게 목 숙이기",
-      speech: "천천히 고개를 좌우로 움직여볼까요? 무리하지 말고 아프지 않은 만큼만 살며시 젖혀주세요.",
-      guide: "고개를 오른쪽으로 천천히 기울였다가, 반대쪽으로도 부드럽게 움직입니다.",
+      speech: "이번에는 목을 부드럽게 움직여볼게요. 무리하지 말고 아프지 않은 만큼만 움직여주세요.",
+      guide: "머리를 목 관절 중심으로 오른쪽으로 천천히 기울였다가, 가운데를 거쳐 왼쪽으로도 부드럽게 움직입니다.",
       duration: 40,
       motionType: "neck"
     },
@@ -112,22 +119,354 @@ const KongiExerciseRoom = {
     }
   },
 
-  // 한국어 음성 발화 (TTS)
-  speak(text) {
-    if (!this.voiceEnabled || !('speechSynthesis' in window)) return;
+  // --------------------------------------------------------------------------
+  // 관절 리그 및 표정 제어 (Joint Rig & Expression System)
+  // --------------------------------------------------------------------------
+  initRig() {
+    this.startBlinkLoop();
+  },
+
+  // 자연스러운 눈 깜빡임 루프 (3.5초~5초마다 부드럽게 감겼다 뜸)
+  startBlinkLoop() {
+    if (this.blinkInterval) clearInterval(this.blinkInterval);
+    const triggerBlink = () => {
+      const svg = document.getElementById('kongiRigSvg');
+      if (svg) {
+        svg.classList.add('is-blinking');
+        setTimeout(() => {
+          svg.classList.remove('is-blinking');
+        }, 160);
+      }
+      const nextDelay = 3200 + Math.random() * 2000;
+      this.blinkInterval = setTimeout(triggerBlink, nextDelay);
+    };
+    this.blinkInterval = setTimeout(triggerBlink, 3000);
+  },
+
+  // 한국어 음성 발화 (TTS) 및 립싱크(입 모양) 실시간 동기화
+  speak(text, onComplete) {
+    if (!this.voiceEnabled || !('speechSynthesis' in window)) {
+      if (onComplete) onComplete();
+      return;
+    }
     try {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ko-KR';
-      utterance.rate = 0.85; // 어르신을 위한 편안하고 차분한 속도
-      utterance.pitch = 1.05;
+      utterance.rate = 0.82; // 치매 및 어르신을 위한 느리고 편안한 발화 속도
+      utterance.pitch = 1.06; // 따뜻하고 다정한 목소리 톤
+
+      utterance.onstart = () => {
+        this.startLipSync();
+      };
+      utterance.onend = () => {
+        this.stopLipSync();
+        if (onComplete) onComplete();
+      };
+      utterance.onerror = () => {
+        this.stopLipSync();
+        if (onComplete) onComplete();
+      };
+
       window.speechSynthesis.speak(utterance);
     } catch (e) {
       console.warn('음성 발화 예외:', e);
+      this.stopLipSync();
+      if (onComplete) onComplete();
     }
   },
 
-  // 운동 프로그램 시작
+  // 립싱크 시작 (말할 때 입 모양을 자연스럽게 오물오물 전환)
+  startLipSync() {
+    this.isTalking = true;
+    const svg = document.getElementById('kongiRigSvg');
+    if (!svg) return;
+    if (this.lipSyncInterval) clearInterval(this.lipSyncInterval);
+
+    let stateToggle = false;
+    this.lipSyncInterval = setInterval(() => {
+      if (!this.isTalking) {
+        clearInterval(this.lipSyncInterval);
+        return;
+      }
+      stateToggle = !stateToggle;
+      svg.setAttribute('data-mouth', stateToggle ? 'talk-a' : 'talk-o');
+    }, 140);
+  },
+
+  // 립싱크 종료 (항상 따뜻하고 편안한 미소 표정으로 복귀)
+  stopLipSync() {
+    this.isTalking = false;
+    if (this.lipSyncInterval) clearInterval(this.lipSyncInterval);
+    const svg = document.getElementById('kongiRigSvg');
+    if (svg) {
+      svg.setAttribute('data-mouth', 'smile');
+    }
+  },
+
+  // 모든 관절 애니메이션 타임아웃 정리 및 초기화
+  clearAllRigMotions() {
+    this.neckSequenceTimeouts.forEach(t => clearTimeout(t));
+    this.neckSequenceTimeouts = [];
+
+    const head = document.getElementById('kongiHeadGroup');
+    const leftEar = document.getElementById('leftEarGroup');
+    const rightEar = document.getElementById('rightEarGroup');
+    const leftArm = document.getElementById('leftArmGroup');
+    const rightArm = document.getElementById('rightArmGroup');
+    const leftLeg = document.getElementById('leftLegGroup');
+    const rightLeg = document.getElementById('rightLegGroup');
+
+    if (head) head.style.transform = 'rotate(0deg)';
+    if (leftEar) leftEar.style.transform = 'rotate(0deg)';
+    if (rightEar) rightEar.style.transform = 'rotate(0deg)';
+    if (leftArm) leftArm.style.transform = 'rotate(0deg)';
+    if (rightArm) rightArm.style.transform = 'rotate(0deg)';
+    if (leftLeg) leftLeg.style.transform = 'rotate(0deg)';
+    if (rightLeg) rightLeg.style.transform = 'rotate(0deg)';
+  },
+
+  // --------------------------------------------------------------------------
+  // [2단계: 부드럽게 목 움직이기] 핵심 관절 시퀀서
+  // 1. 정면을 바라본다.
+  // 2. 고개를 오른쪽으로 천천히 기울인다. (목 관절 중심)
+  // 3. 약 2초 유지한다.
+  // 4. 천천히 중앙으로 돌아온다.
+  // 5. 고개를 왼쪽으로 천천히 기울인다. (목 관절 중심)
+  // 6. 약 2초 유지한다.
+  // 7. 다시 중앙으로 돌아온다.
+  // 매우 천천히 진행 · 엉덩이는 의자에서 떨어지지 않음 · 어깨 편안 · 정면 고정 카메라
+  // --------------------------------------------------------------------------
+  startNeckExerciseMotion() {
+    this.clearAllRigMotions();
+    const head = document.getElementById('kongiHeadGroup');
+    const leftEar = document.getElementById('leftEarGroup');
+    const rightEar = document.getElementById('rightEarGroup');
+    if (!head) return;
+
+    const schedule = (fn, delayMs) => {
+      const tid = setTimeout(() => {
+        if (!this.isPaused) fn();
+      }, delayMs);
+      this.neckSequenceTimeouts.push(tid);
+    };
+
+    const runNeckCycle = (isSecondCycle = false) => {
+      // 1. 시작 (0s): 정면을 바라본다
+      head.style.transform = 'rotate(0deg)';
+      if (leftEar) leftEar.style.transform = 'rotate(0deg)';
+      if (rightEar) rightEar.style.transform = 'rotate(0deg)';
+
+      if (!isSecondCycle) {
+        // 시작 전 안내 음성
+        this.speak("이번에는 목을 부드럽게 움직여볼게요.");
+      }
+
+      // 2. 스텝 (약 2.6초 후): 고개를 오른쪽으로 천천히 기울인다
+      schedule(() => {
+        if (this.isPaused) return;
+        this.speak("오른쪽으로 천천히 기울여보세요.");
+        // 목 관절 피벗(300, 215) 중심으로 아주 천천히 +13도 회전
+        head.style.transform = 'rotate(13deg)';
+        if (leftEar) leftEar.style.transform = 'rotate(-3deg)';
+        if (rightEar) rightEar.style.transform = 'rotate(2deg)';
+      }, 2600);
+
+      // 3. 스텝 (약 6.6초 후): 약 2초간 편안하게 유지
+      schedule(() => {
+        if (this.isPaused) return;
+        // 각도 그대로 유지 (+13deg), 편안하게 미소
+      }, 6600);
+
+      // 4. 스텝 (약 8.8초 후): 천천히 중앙으로 돌아온다
+      schedule(() => {
+        if (this.isPaused) return;
+        this.speak("좋아요. 다시 가운데로 돌아올게요.");
+        head.style.transform = 'rotate(0deg)';
+        if (leftEar) leftEar.style.transform = 'rotate(0deg)';
+        if (rightEar) rightEar.style.transform = 'rotate(0deg)';
+      }, 8800);
+
+      // 5. 스텝 (약 12.2초 후): 고개를 왼쪽으로 천천히 기울인다
+      schedule(() => {
+        if (this.isPaused) return;
+        this.speak("이번에는 반대쪽이에요.");
+        // 목 관절 피벗 중심으로 아주 천천히 -13도 회전
+        head.style.transform = 'rotate(-13deg)';
+        if (leftEar) leftEar.style.transform = 'rotate(-2deg)';
+        if (rightEar) rightEar.style.transform = 'rotate(3deg)';
+      }, 12200);
+
+      // 6. 스텝 (약 16.2초 후): 약 2초간 편안하게 유지
+      schedule(() => {
+        if (this.isPaused) return;
+        // 각도 그대로 유지 (-13deg)
+      }, 16200);
+
+      // 7. 스텝 (약 18.4초 후): 다시 중앙으로 돌아온다
+      schedule(() => {
+        if (this.isPaused) return;
+        this.speak("무리하지 말고 아프지 않은 만큼만 움직여주세요.");
+        head.style.transform = 'rotate(0deg)';
+        if (leftEar) leftEar.style.transform = 'rotate(0deg)';
+        if (rightEar) rightEar.style.transform = 'rotate(0deg)';
+      }, 18400);
+
+      // 약 22초 후 2회차 사이클 부드럽게 연결
+      if (!isSecondCycle) {
+        schedule(() => {
+          if (!this.isPaused) runNeckCycle(true);
+        }, 22500);
+      }
+    };
+
+    runNeckCycle(false);
+  },
+
+  // 다른 단계별 신체 관절 실제 움직임 적용
+  applyStepJointMotion(motionType) {
+    this.clearAllRigMotions();
+    const head = document.getElementById('kongiHeadGroup');
+    const leftArm = document.getElementById('leftArmGroup');
+    const rightArm = document.getElementById('rightArmGroup');
+    const leftHand = document.getElementById('leftHandGroup');
+    const rightHand = document.getElementById('rightHandGroup');
+    const leftLeg = document.getElementById('leftLegGroup');
+
+    const schedule = (fn, delayMs) => {
+      const tid = setTimeout(() => {
+        if (!this.isPaused) fn();
+      }, delayMs);
+      this.neckSequenceTimeouts.push(tid);
+    };
+
+    switch (motionType) {
+      case 'neck':
+        this.startNeckExerciseMotion();
+        break;
+
+      case 'prep':
+      case 'finish':
+        // 가슴 및 어깨 안정 호흡 관절 모션
+        const breatheStep = () => {
+          if (leftArm && rightArm) {
+            leftArm.style.transform = 'translateY(-6px) rotate(2deg)';
+            rightArm.style.transform = 'translateY(-6px) rotate(-2deg)';
+          }
+          schedule(() => {
+            if (leftArm && rightArm) {
+              leftArm.style.transform = 'translateY(0) rotate(0deg)';
+              rightArm.style.transform = 'translateY(0) rotate(0deg)';
+            }
+          }, 3000);
+        };
+        breatheStep();
+        schedule(breatheStep, 6500);
+        schedule(breatheStep, 13000);
+        schedule(breatheStep, 19500);
+        break;
+
+      case 'shoulder':
+        // 3단계: 어깨 으쓱으쓱 올렸다 내리기
+        const shoulderStep = () => {
+          if (leftArm && rightArm) {
+            leftArm.style.transform = 'translateY(-14px) rotate(4deg)';
+            rightArm.style.transform = 'translateY(-14px) rotate(-4deg)';
+          }
+          schedule(() => {
+            if (leftArm && rightArm) {
+              leftArm.style.transform = 'translateY(0) rotate(0deg)';
+              rightArm.style.transform = 'translateY(0) rotate(0deg)';
+            }
+          }, 3200);
+        };
+        shoulderStep();
+        schedule(shoulderStep, 7000);
+        schedule(shoulderStep, 14000);
+        schedule(shoulderStep, 21000);
+        break;
+
+      case 'arm':
+        // 4단계: 팔 앞으로 뻗고 당기기
+        const armStep = () => {
+          if (leftArm && rightArm) {
+            leftArm.style.transform = 'rotate(-10deg) scale(1.04)';
+            rightArm.style.transform = 'rotate(10deg) scale(1.04)';
+          }
+          schedule(() => {
+            if (leftArm && rightArm) {
+              leftArm.style.transform = 'rotate(0deg) scale(1)';
+              rightArm.style.transform = 'rotate(0deg) scale(1)';
+            }
+          }, 3500);
+        };
+        armStep();
+        schedule(armStep, 7500);
+        schedule(armStep, 15000);
+        schedule(armStep, 22500);
+        break;
+
+      case 'finger':
+        // 5단계: 손가락 및 손목 주먹 쥐고 펴기
+        const fingerStep = () => {
+          if (leftHand && rightHand) {
+            leftHand.style.transform = 'rotate(10deg)';
+            rightHand.style.transform = 'rotate(-10deg)';
+          }
+          schedule(() => {
+            if (leftHand && rightHand) {
+              leftHand.style.transform = 'rotate(-6deg)';
+              rightHand.style.transform = 'rotate(6deg)';
+            }
+          }, 2000);
+        };
+        fingerStep();
+        schedule(fingerStep, 4500);
+        schedule(fingerStep, 9000);
+        schedule(fingerStep, 13500);
+        schedule(fingerStep, 18000);
+        break;
+
+      case 'knee':
+        // 6단계: 의자에서 무릎 살짝 들기 (엉덩이는 의자에 완전히 고정)
+        const kneeStep = () => {
+          if (leftLeg) {
+            leftLeg.style.transform = 'translateY(-10px) rotate(-3deg)';
+          }
+          schedule(() => {
+            if (leftLeg) {
+              leftLeg.style.transform = 'translateY(0) rotate(0deg)';
+            }
+          }, 3200);
+        };
+        kneeStep();
+        schedule(kneeStep, 7000);
+        schedule(kneeStep, 14000);
+        schedule(kneeStep, 21000);
+        break;
+
+      case 'ankle':
+        // 7단계: 발끝 들고 발목 까딱까딱
+        const ankleStep = () => {
+          if (leftLeg) leftLeg.style.transform = 'rotate(-2deg)';
+          schedule(() => {
+            if (leftLeg) leftLeg.style.transform = 'rotate(0deg)';
+          }, 2200);
+        };
+        ankleStep();
+        schedule(ankleStep, 4800);
+        schedule(ankleStep, 9600);
+        schedule(ankleStep, 14400);
+        break;
+
+      default:
+        break;
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // 운동 프로그램 실행 및 타이머 제어
+  // --------------------------------------------------------------------------
   startProgram(key) {
     const prog = this.programs[key];
     if (!prog) return;
@@ -149,7 +488,8 @@ const KongiExerciseRoom = {
     // UI 정보 업데이트
     document.getElementById('currentProgramBadge').textContent = `🐶 콩이 — ${prog.title}`;
     
-    // 첫 동작 진입
+    // 리그 초기화 및 첫 동작 진입
+    this.initRig();
     this.renderCurrentStep();
     this.startStepTimer();
 
@@ -165,7 +505,9 @@ const KongiExerciseRoom = {
 
     // 헤더 카운터 및 진행도
     const indicatorEl = document.getElementById('stepProgressIndicator');
-    indicatorEl.textContent = `${this.currentStepIndex + 1} / ${this.steps.length} 동작`;
+    if (indicatorEl) {
+      indicatorEl.textContent = `${this.currentStepIndex + 1} / ${this.steps.length} 동작`;
+    }
 
     // 동작 명칭 및 말풍선
     document.getElementById('actionNameText').textContent = step.actionTitle;
@@ -175,17 +517,14 @@ const KongiExerciseRoom = {
     // 타이머 텍스트 업데이트
     this.updateTimerDisplay();
 
-    // 콩이 캐릭터 모션 이미지 연출
-    const charImg = document.getElementById('giantKongiImg');
-    if (charImg) {
-      charImg.style.transform = 'scale(1.04)';
-      setTimeout(() => {
-        charImg.style.transform = 'scale(1)';
-      }, 350);
-    }
+    // 실제 신체 관절 움직임 실행 (목 운동 2단계 또는 해당 동작 모션)
+    this.applyStepJointMotion(step.motionType);
 
-    // 음성 안내 발화
-    this.speak(step.speech);
+    // 2단계(목 운동)의 경우 startNeckExerciseMotion 내부에서 세밀한 안내 음성을 순차적으로 발화하므로,
+    // 다른 일반 단계인 경우에만 기본 step.speech 발화
+    if (step.motionType !== 'neck') {
+      this.speak(step.speech);
+    }
   },
 
   // 단계 타이머 시작
@@ -198,12 +537,13 @@ const KongiExerciseRoom = {
       this.totalElapsedSeconds++;
       this.updateTimerDisplay();
 
-      // 중간 음성 격려 멘트
-      if (this.stepSecondsRemaining === 15) {
+      // 중간 음성 격려 멘트 (목 운동 단계 외의 단계에서 15초 남았을 때 격려)
+      const currentStep = this.steps[this.currentStepIndex];
+      if (currentStep && currentStep.motionType !== 'neck' && this.stepSecondsRemaining === 15) {
         this.speak("아주 잘하고 계세요. 무리하지 마시고 편안하게 호흡하세요.");
       }
 
-      // 단계 종료 시 다음 동작으로 자동 또는 유도
+      // 단계 종료 시 다음 동작으로 자동 유도
       if (this.stepSecondsRemaining <= 0) {
         if (this.currentStepIndex < this.steps.length - 1) {
           this.nextStep();
@@ -251,20 +591,37 @@ const KongiExerciseRoom = {
     const overlay = document.getElementById('pauseOverlay');
 
     if (this.isPaused) {
+      // 잠깐 쉬기 상태
       btn.innerHTML = '<span>▶</span><span>계속하기</span>';
       btn.style.background = 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)';
       if (overlay) overlay.classList.add('active');
+      
+      // 진행 중인 모든 시퀀스 타임아웃 중지
+      this.neckSequenceTimeouts.forEach(t => clearTimeout(t));
+      this.neckSequenceTimeouts = [];
+      this.stopLipSync();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
       this.speak("잠시 쉬어갑니다. 숨을 편안하게 고르세요. 몸이 불편하시면 언제든 그만하셔도 괜찮아요.");
     } else {
+      // 다시 계속하기 상태
       btn.innerHTML = '<span>⏸</span><span>잠깐 쉬기</span>';
       btn.style.background = 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)';
       if (overlay) overlay.classList.remove('active');
-      this.speak("다시 천천히 시작해 볼까요?");
+
+      this.speak("다시 천천히 시작해 볼까요?", () => {
+        const step = this.steps[this.currentStepIndex];
+        if (step) {
+          this.applyStepJointMotion(step.motionType);
+        }
+      });
     }
   },
 
   // [그만하기] 버튼 동작
   exitProgram() {
+    this.clearAllRigMotions();
+    this.stopLipSync();
     this.speak("운동을 종료합니다. 오늘 참여하신 내용을 안전하게 저장할게요.");
     this.finishExercise(false);
   },
@@ -272,6 +629,8 @@ const KongiExerciseRoom = {
   // 운동 종료 처리 및 기록 저장
   finishExercise(isFullyCompleted) {
     clearInterval(this.timerInterval);
+    this.clearAllRigMotions();
+    this.stopLipSync();
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 
     const elapsedMins = Math.floor(this.totalElapsedSeconds / 60);
@@ -297,6 +656,7 @@ const KongiExerciseRoom = {
     document.getElementById('viewPlayStage').classList.remove('active');
     const finishStage = document.getElementById('viewFinishStage');
     finishStage.classList.add('active');
+
 
     // 리포트 테이블 채우기
     document.getElementById('reportDate').textContent = recordData.participatedAt;
