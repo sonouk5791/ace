@@ -235,163 +235,53 @@
             <rect x="376" y="365" width="14" height="100" rx="5" fill="#6A4016" opacity="0.85"/>
           </g>
 
-          <!-- 3. 하체 (Pelvis & Legs) - 엉덩이는 의자에서 절대 떨어지지 않음! -->
-          <g id="pelvisLegsLayer" class="rig-part-lower-body">
-            <!-- 엉덩이/허벅지 (안정 착석) -->
-            <path d="M 195 335 Q 300 348 405 335 L 420 405 Q 300 420 180 405 Z" fill="#243352" stroke="#172238" stroke-width="4"/>
-            
-            <!-- 왼쪽 다리 (무릎 관절 포함) -->
-            <g id="leftLegGroup" class="joint-leg-left" style="transform-origin: 240px 370px;">
-              <path d="M 215 375 L 210 440 L 255 440 L 260 375 Z" fill="#2B3D63" stroke="#172238" stroke-width="3"/>
-              <!-- 신발 (파란색 스니커즈) -->
-              <path d="M 190 440 Q 235 435 265 440 L 268 468 Q 230 475 186 468 Z" fill="#2563EB" stroke="#1E40AF" stroke-width="3"/>
-              <ellipse cx="206" cy="460" rx="20" ry="9" fill="#FFFFFF"/>
-              <rect x="185" y="465" width="85" height="10" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
-            </g>
-
-            <!-- 오른쪽 다리 (무릎 관절 포함) -->
-            <g id="rightLegGroup" class="joint-leg-right" style="transform-origin: 360px 370px;">
-              <path d="M 340 375 L 345 440 L 390 440 L 385 375 Z" fill="#2B3D63" stroke="#172238" stroke-width="3"/>
-              <!-- 신발 (파란색 스니커즈) -->
-              <path d="M 335 440 Q 365 435 410 440 L 414 468 Q 370 475 332 468 Z" fill="#2563EB" stroke="#1E40AF" stroke-width="3"/>
-              <ellipse cx="394" cy="460" rx="20" ry="9" fill="#FFFFFF"/>
-              <rect x="330" y="465" width="85" height="10" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
-            </g>
+          <!-- 3. 원본 콩이 착석 몸통 및 의자 고정 하체 (초록색 조끼 + 새싹 로고) -->
+          <g id="torsoGroup" class="joint-torso" style="transform-origin: 300px 390px;">
+            <image id="kongiTorsoImg" href="assets/images/kongi-parts/kongi_official_torso.png" x="165" y="115" width="270" height="354" preserveAspectRatio="xMidYMid meet" />
           </g>
 
-          <!-- 4. 몸통 (Torso) - 가슴 호흡 팽창/수축 지원, 피벗은 엉덩이 중심 (300, 360) -->
-          <g id="torsoGroup" class="joint-torso" style="transform-origin: 300px 360px;">
-            <!-- 흰색 셔츠 몸통 베이스 -->
-            <path d="M 220 220 L 380 220 L 395 345 L 205 345 Z" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="3"/>
-            <!-- 노란색 체크 조끼 (Vest) -->
-            <path d="M 230 228 Q 300 240 370 228 L 385 345 Q 300 355 215 345 Z" fill="url(#vestPlaid)" stroke="#D99E10" stroke-width="4"/>
-            <!-- 조끼 브이넥 컷아웃 -->
-            <path d="M 268 228 L 300 295 L 332 228 Z" fill="#F8FAFC" stroke="#D99E10" stroke-width="3"/>
-            <!-- 네이비 넥타이 -->
-            <path d="M 292 235 L 308 235 L 306 280 L 300 292 L 294 280 Z" fill="#1E3A8A" stroke="#0F172A" stroke-width="1.5"/>
-          </g>
+          <!-- 4. 원본 콩이 머리 그룹 (Head Group) - [목 관절 피벗]: (293px, 312px) 중심으로 부드럽게 기울임 -->
+          <g id="kongiHeadGroup" class="joint-head" style="transform-origin: 293px 312px;">
+            <!-- 원본 콩이 머리 파츠 (얼굴, 캐러멜 귀, 머리 털뭉치, 연두색 스카프) -->
+            <image id="kongiHeadImg" href="assets/images/kongi-parts/kongi_official_head.png" x="165" y="115" width="270" height="354" preserveAspectRatio="xMidYMid meet" />
 
-          <!-- 5. 어깨 & 팔 (Shoulders & Arms) -->
-          <!-- 왼쪽 팔 - 어깨 피벗 (225, 230) -->
-          <g id="leftArmGroup" class="joint-arm-left" style="transform-origin: 225px 230px;">
-            <path d="M 225 225 Q 170 270 185 330 L 215 332 Q 200 280 245 240 Z" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="3.5"/>
-            <!-- 손 - 손목 피벗 (198, 335) -->
-            <g id="leftHandGroup" class="joint-hand-left" style="transform-origin: 198px 335px;">
-              <ellipse cx="202" cy="345" rx="20" ry="16" fill="#F8E0B4" stroke="#875421" stroke-width="3"/>
-              <path d="M 194 340 L 194 353 M 204 340 L 204 355 M 214 340 L 214 353" stroke="#D4A060" stroke-width="2.5" stroke-linecap="round"/>
-            </g>
-          </g>
-
-          <!-- 오른쪽 팔 - 어깨 피벗 (375, 230) -->
-          <g id="rightArmGroup" class="joint-arm-right" style="transform-origin: 375px 230px;">
-            <path d="M 375 225 Q 430 270 415 330 L 385 332 Q 400 280 355 240 Z" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="3.5"/>
-            <!-- 손 - 손목 피벗 (402, 335) -->
-            <g id="rightHandGroup" class="joint-hand-right" style="transform-origin: 402px 335px;">
-              <ellipse cx="398" cy="345" rx="20" ry="16" fill="#F8E0B4" stroke="#875421" stroke-width="3"/>
-              <path d="M 386 340 L 386 353 M 396 340 L 396 355 M 406 340 L 406 353" stroke="#D4A060" stroke-width="2.5" stroke-linecap="round"/>
-            </g>
-          </g>
-
-          <!-- 6. 셔츠 깃 (목 관절 베이스) -->
-          <g id="neckCollar" class="rig-part-collar">
-            <path d="M 260 220 L 290 238 L 275 248 Z" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2.5"/>
-            <path d="M 340 220 L 310 238 L 325 248 Z" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2.5"/>
-          </g>
-
-          <!-- 7. 머리 그룹 (Head Group) - [목 관절 피벗]: (300px, 215px) 중심으로 천천히 회전/기울임 -->
-          <g id="kongiHeadGroup" class="joint-head" style="transform-origin: 300px 215px;">
-            
-            <!-- 양쪽 귀 (머리가 기울어질 때 부드러운 관성 반동) -->
-            <g id="leftEarGroup" class="joint-ear-left" style="transform-origin: 215px 105px;">
-              <path d="M 215 100 C 140 105 130 180 160 235 C 185 265 220 220 225 140 Z" fill="#9C5B2F" stroke="#683918" stroke-width="4"/>
-              <path d="M 180 135 C 150 155 150 195 170 215" stroke="#BA733F" stroke-width="4" stroke-linecap="round" fill="none"/>
-            </g>
-            <g id="rightEarGroup" class="joint-ear-right" style="transform-origin: 385px 105px;">
-              <path d="M 385 100 C 460 105 470 180 440 235 C 415 265 380 220 375 140 Z" fill="#9C5B2F" stroke="#683918" stroke-width="4"/>
-              <path d="M 420 135 C 450 155 450 195 430 215" stroke="#BA733F" stroke-width="4" stroke-linecap="round" fill="none"/>
-            </g>
-
-            <!-- 윗머리 털뭉치 셰이프 (브라운 헤어) -->
-            <path d="M 270 65 Q 285 30 310 40 Q 335 35 330 65 Z" fill="#8B5226" stroke="#683918" stroke-width="4"/>
-
-            <!-- 얼굴 베이스 (골든리트리버 둥근 얼굴) -->
-            <ellipse cx="300" cy="135" rx="108" ry="85" fill="#F8E0B4" stroke="#875421" stroke-width="5"/>
-            <!-- 볼살 둥근 돌출 (좌우 통통한 뺨) -->
-            <ellipse cx="230" cy="165" rx="36" ry="30" fill="#F8E0B4"/>
-            <ellipse cx="370" cy="165" rx="36" ry="30" fill="#F8E0B4"/>
-            
-            <!-- 부드러운 핑크빛 볼터치 -->
-            <ellipse cx="230" cy="168" rx="18" ry="10" fill="rgba(255, 120, 140, 0.4)"/>
-            <ellipse cx="370" cy="168" rx="18" ry="10" fill="rgba(255, 120, 140, 0.4)"/>
-
-            <!-- 이마 눈썹 (다정한 갈색 눈썹) -->
-            <path d="M 235 90 Q 255 82 270 90" stroke="#7A451E" stroke-width="5" stroke-linecap="round" fill="none"/>
-            <path d="M 330 90 Q 345 82 365 90" stroke="#7A451E" stroke-width="5" stroke-linecap="round" fill="none"/>
-
-            <!-- 둥근 뿔테 안경 (Glasses) -->
-            <g id="kongiGlasses" class="rig-part-glasses">
-              <!-- 안경 렌즈 광택 -->
-              <circle cx="252" cy="136" r="38" fill="rgba(255, 255, 255, 0.22)"/>
-              <circle cx="348" cy="136" r="38" fill="rgba(255, 255, 255, 0.22)"/>
-              <!-- 안경 테 -->
-              <circle cx="252" cy="136" r="38" fill="none" stroke="#3D2012" stroke-width="7"/>
-              <circle cx="348" cy="136" r="38" fill="none" stroke="#3D2012" stroke-width="7"/>
-              <!-- 안경 코 브릿지 -->
-              <path d="M 290 132 Q 300 126 310 132" fill="none" stroke="#3D2012" stroke-width="7" stroke-linecap="round"/>
-            </g>
-
-            <!-- 눈 (Eyes) - 자연스러운 눈 깜빡임 및 미소 지원 -->
+            <!-- 눈 깜빡임 오버레이 (원작의 부드러운 반달 눈꺼풀) -->
             <g id="kongiEyesGroup" class="joint-eyes">
-              <!-- 열린 눈 (눈동자 반짝임) -->
-              <g class="eye-open">
-                <ellipse cx="252" cy="136" rx="16" ry="20" fill="#24140D"/>
-                <circle cx="247" cy="128" r="6.5" fill="#FFFFFF"/>
-                <circle cx="258" cy="143" r="3" fill="#FFFFFF"/>
-                <ellipse cx="348" cy="136" rx="16" ry="20" fill="#24140D"/>
-                <circle cx="343" cy="128" r="6.5" fill="#FFFFFF"/>
-                <circle cx="354" cy="143" r="3" fill="#FFFFFF"/>
-              </g>
-              <!-- 깜빡일 때 표시되는 편안한 반달 웃음 눈꺼풀 -->
-              <g class="eye-closed" style="display: none;">
-                <path d="M 236 138 Q 252 154 268 138" fill="none" stroke="#452210" stroke-width="5.5" stroke-linecap="round"/>
-                <path d="M 332 138 Q 348 154 364 138" fill="none" stroke="#452210" stroke-width="5.5" stroke-linecap="round"/>
-              </g>
+              <image id="kongiEyesBlinkImg" href="assets/images/kongi-parts/kongi_eyes_blink.png" x="165" y="115" width="270" height="354" preserveAspectRatio="xMidYMid meet" class="eye-closed" style="display: none;" />
             </g>
 
-            <!-- 코 (Nose) -->
-            <path d="M 288 150 Q 300 144 312 150 Q 316 164 300 168 Q 284 164 288 150 Z" fill="#3D2012"/>
-            <ellipse cx="296" cy="151" rx="4" ry="2" fill="rgba(255, 255, 255, 0.45)"/>
-
-            <!-- 입 (Mouth) - 따뜻한 미소 및 립싱크 지원 -->
+            <!-- 립싱크 및 '후~' 호흡 입 모양 오버레이 -->
             <g id="kongiMouthGroup" class="joint-mouth">
-              <!-- 1. 기본 편안한 미소 (Smile) -->
-              <g class="mouth-state mouth-smile">
-                <path d="M 300 168 L 300 174 M 282 174 Q 300 188 318 174" fill="none" stroke="#4A2612" stroke-width="4.5" stroke-linecap="round"/>
-              </g>
-              <!-- 2. 말할 때 열리는 입 1 (Talk A) -->
-              <g class="mouth-state mouth-talk-a" style="display: none;">
-                <path d="M 282 173 Q 300 170 318 173 Q 320 196 300 198 Q 280 196 282 173 Z" fill="#5A1A1A" stroke="#4A2612" stroke-width="3.5"/>
-                <path d="M 288 186 Q 300 178 312 186 Q 308 196 300 197 Q 292 196 288 186 Z" fill="#FF708F"/>
-              </g>
-              <!-- 3. 말할 때 열리는 입 2 (Talk O) -->
-              <g class="mouth-state mouth-talk-o" style="display: none;">
-                <ellipse cx="300" cy="182" rx="14" ry="12" fill="#5A1A1A" stroke="#4A2612" stroke-width="3.5"/>
-                <ellipse cx="300" cy="186" rx="8" ry="6" fill="#FF708F"/>
-              </g>
-              <!-- 4. 숨 내쉴 때 자연스러운 '후~' 입 모양 (Exhale) -->
+              <!-- 1. 숨 내쉴 때 자연스러운 '후~' 입 모양 -->
               <g class="mouth-state mouth-exhale" style="display: none;">
-                <!-- 둥글게 오므린 입술 -->
-                <circle cx="300" cy="180" r="9" fill="#5A1A1A" stroke="#4A2612" stroke-width="3.5"/>
-                <circle cx="300" cy="180" r="5" fill="#FF708F"/>
-                <!-- 입술 오므림 주름선 -->
-                <path d="M 290 177 Q 300 173 310 177" fill="none" stroke="#4A2612" stroke-width="2.5" stroke-linecap="round"/>
-                <!-- 부드럽게 퍼져나가는 숨결 기류 표현 -->
-                <path d="M 314 179 Q 324 175 334 179" fill="none" stroke="rgba(255, 255, 255, 0.75)" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 315 183 Q 323 186 331 183" fill="none" stroke="rgba(255, 255, 255, 0.55)" stroke-width="2.2" stroke-linecap="round"/>
+                <ellipse cx="276" cy="281" rx="14" ry="11" fill="#FAF6EE" />
+                <circle cx="276" cy="281" r="7" fill="#5A1A1A" stroke="#4A2612" stroke-width="2.5"/>
+                <circle cx="276" cy="281" r="4" fill="#FF708F"/>
+                <!-- 부드러운 숨결 기류 표현 -->
+                <path d="M 288 280 Q 300 276 312 280" fill="none" stroke="rgba(255, 255, 255, 0.85)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M 290 285 Q 300 288 310 285" fill="none" stroke="rgba(255, 255, 255, 0.65)" stroke-width="2.2" stroke-linecap="round"/>
+              </g>
+              <!-- 2. 말할 때 자연스러운 미세 입 모양 -->
+              <g class="mouth-state mouth-talk-a" style="display: none;">
+                <ellipse cx="276" cy="281" rx="9" ry="8" fill="#5A1A1A" stroke="#4A2612" stroke-width="2"/>
+                <ellipse cx="276" cy="283" rx="5" ry="4" fill="#FF708F"/>
+              </g>
+              <g class="mouth-state mouth-talk-o" style="display: none;">
+                <ellipse cx="276" cy="281" rx="8" ry="9" fill="#5A1A1A" stroke="#4A2612" stroke-width="2"/>
+                <ellipse cx="276" cy="282" rx="4" ry="5" fill="#FF708F"/>
               </g>
             </g>
 
           </g>
+
+          <!-- 호환성 유지를 위한 팔/다리 리그 보조 앵커 (숨김) -->
+          <g id="pelvisLegsLayer" style="display: none;"></g>
+          <g id="leftLegGroup" style="display: none;"></g>
+          <g id="rightLegGroup" style="display: none;"></g>
+          <g id="leftArmGroup" style="display: none;"></g>
+          <g id="rightArmGroup" style="display: none;"></g>
+          <g id="leftEarGroup" style="display: none;"></g>
+          <g id="rightEarGroup" style="display: none;"></g>
         </svg>
 
         <!-- 호환성 유지용 이미지 엘리먼트 (숨김) -->

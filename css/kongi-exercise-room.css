@@ -457,7 +457,7 @@ body {
 
 /* 1. 몸통 (Torso) - 편안하고 차분한 안정 호흡 (엉덩이/의자는 완전 고정) */
 .joint-torso {
-  transform-origin: 300px 360px;
+  transform-origin: 300px 390px;
   animation: kongiTorsoBreathe 5s ease-in-out infinite;
 }
 
@@ -466,14 +466,14 @@ body {
     transform: scale(1, 1);
   }
   50% {
-    transform: scale(1.008, 1.015);
+    transform: scale(1.015, 1.02);
   }
 }
 
-/* 2. 목 관절 (Neck Joint) & 머리 - 목 카라 중심 (300px, 215px) 기준 회전 */
+/* 2. 목 관절 (Neck Joint) & 머리 - 원본 콩이 목 스카프 매듭 중심 (293px, 312px) 기준 회전 */
 .joint-head {
-  transform-origin: 300px 215px;
-  transition: transform 3.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-origin: 293px 312px;
+  transition: transform 3.8s cubic-bezier(0.25, 0.8, 0.25, 1);
   will-change: transform;
 }
 
