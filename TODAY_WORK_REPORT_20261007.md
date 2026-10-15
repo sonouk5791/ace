@@ -3,8 +3,8 @@
 > **작성일자**: 2026년 10월 7일  
 > **프로젝트명**: 기억정원 디지털 AI 학교  
 > **원격 GitHub 저장소**: [https://github.com/sonouk5791/school](https://github.com/sonouk5791/school)  
-> **현재 실서버 배포 주소**: [https://temporary-spry-savanna-f1xrq2o.vercel.app/](https://temporary-spry-savanna-f1xrq2o.vercel.app/)  
-> **Vercel 계정 영구 연결 링크**: [https://vercel.com/claim-deployment?code=0c2d57f1-4f6d-47b6-9f5b-57e0cd93972d](https://vercel.com/claim-deployment?code=0c2d57f1-4f6d-47b6-9f5b-57e0cd93972d)  
+> **현재 실서버 배포 주소**: [https://temporary-speedy-sapphire-m185wt9.vercel.app/](https://temporary-speedy-sapphire-m185wt9.vercel.app/)  
+> **Vercel 계정 영구 연결 링크**: [https://vercel.com/claim-deployment?code=85edf4ac-398f-4e51-b323-24fec5a863bb](https://vercel.com/claim-deployment?code=85edf4ac-398f-4e51-b323-24fec5a863bb)  
 
 ---
 
