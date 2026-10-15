@@ -236,7 +236,7 @@
           </g>
 
           <!-- 3. 원본 콩이 착석 몸통 및 의자 고정 하체 (초록색 조끼 + 새싹 로고) -->
-          <g id="torsoGroup" class="joint-torso" style="transform-origin: 300px 390px;">
+          <g id="torsoGroup" class="joint-torso" style="transform-origin: 300px 410px;">
             <image id="kongiTorsoImg" href="assets/images/kongi-parts/kongi_official_torso.png" x="165" y="115" width="270" height="354" preserveAspectRatio="xMidYMid meet" />
           </g>
 
@@ -252,14 +252,11 @@
 
             <!-- 립싱크 및 '후~' 호흡 입 모양 오버레이 -->
             <g id="kongiMouthGroup" class="joint-mouth">
-              <!-- 1. 숨 내쉴 때 자연스러운 '후~' 입 모양 -->
+              <!-- 1. 숨 내쉴 때 자연스러운 '후~' 오므린 입 모양 (바람 표시 제거) -->
               <g class="mouth-state mouth-exhale" style="display: none;">
-                <ellipse cx="276" cy="281" rx="14" ry="11" fill="#FAF6EE" />
-                <circle cx="276" cy="281" r="7" fill="#5A1A1A" stroke="#4A2612" stroke-width="2.5"/>
-                <circle cx="276" cy="281" r="4" fill="#FF708F"/>
-                <!-- 부드러운 숨결 기류 표현 -->
-                <path d="M 288 280 Q 300 276 312 280" fill="none" stroke="rgba(255, 255, 255, 0.85)" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 290 285 Q 300 288 310 285" fill="none" stroke="rgba(255, 255, 255, 0.65)" stroke-width="2.2" stroke-linecap="round"/>
+                <ellipse cx="276" cy="281" rx="13" ry="10" fill="#FAF6EE" />
+                <ellipse cx="276" cy="281" rx="7.5" ry="8" fill="#5A1A1A" stroke="#4A2612" stroke-width="2.2"/>
+                <ellipse cx="276" cy="281.5" rx="4.2" ry="4.8" fill="#FF708F"/>
               </g>
               <!-- 2. 말할 때 자연스러운 미세 입 모양 -->
               <g class="mouth-state mouth-talk-a" style="display: none;">

@@ -455,19 +455,11 @@ body {
   pointer-events: none;
 }
 
-/* 1. 몸통 (Torso) - 편안하고 차분한 안정 호흡 (엉덩이/의자는 완전 고정) */
+/* 1. 몸통 (Torso) - 정밀 관절 호흡 및 상체 제어 (엉덩이/의자는 완전 고정) */
 .joint-torso {
-  transform-origin: 300px 390px;
-  animation: kongiTorsoBreathe 5s ease-in-out infinite;
-}
-
-@keyframes kongiTorsoBreathe {
-  0%, 100% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(1.015, 1.02);
-  }
+  transform-origin: 300px 410px;
+  transition: transform 3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
 }
 
 /* 2. 목 관절 (Neck Joint) & 머리 - 원본 콩이 목 스카프 매듭 중심 (293px, 312px) 기준 회전 */
@@ -552,7 +544,8 @@ body {
 /* 7. 숨을 천천히 내쉴 때 '후~' 모양 입 (Exhale) */
 .kongi-rig-svg[data-mouth="exhale"] .mouth-exhale {
   display: block !important;
-  animation: exhaleBreathPulse 3.8s ease-in-out;
+  opacity: 1 !important;
+  transition: opacity 0.25s ease-out;
 }
 .kongi-rig-svg[data-mouth="exhale"] .mouth-smile,
 .kongi-rig-svg[data-mouth="exhale"] .mouth-talk-a,
@@ -560,23 +553,15 @@ body {
   display: none !important;
 }
 
-@keyframes exhaleBreathPulse {
-  0% { opacity: 0.6; transform: scale(0.9); }
-  25% { opacity: 1; transform: scale(1.04); }
-  75% { opacity: 0.9; transform: scale(1.02); }
-  100% { opacity: 0.5; transform: scale(0.95); }
-}
-
-/* 1단계 정밀 호흡 모션 진행 시 (가슴/배 팽창 및 어깨 독립 제어) */
+/* 1단계 정밀 호흡 모션 진행 시 (가슴/배 팽창, 어깨 및 머리 1:1 동기화) */
 .kongi-rig-svg.is-breathing-active .joint-torso {
-  animation: none !important;
-  transition: transform 3.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-origin: 300px 410px;
   will-change: transform;
 }
 
 .kongi-rig-svg.is-breathing-active .joint-arm-left,
-.kongi-rig-svg.is-breathing-active .joint-arm-right {
-  transition: transform 3.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+.kongi-rig-svg.is-breathing-active .joint-arm-right,
+.kongi-rig-svg.is-breathing-active .joint-head {
   will-change: transform;
 }
 

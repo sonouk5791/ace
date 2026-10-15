@@ -251,12 +251,39 @@ const KongiExerciseRoom = {
   // "의자에 등을 편안히 기대고, 코로 숨을 깊게 들이쉬어 볼까요?"
   // "좋아요. 이제 입으로 천천히 후~ 내쉬어 볼게요."
   // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // [1단계: 천천히 깊게 호흡하기] 화면 설명과 1:1 완벽 일치 정밀 호흡 시퀀서
+  //
+  // 화면 문구:
+  // “안녕하세요. 콩이예요. 의자에 등을 편안히 기대고, 코로 숨을 깊게 들이쉬어 볼까요?”
+  //
+  // 실제 움직임:
+  // 1. 콩이는 의자에 안정적으로 앉아 정면을 바라봅니다.
+  // 2. 코로 숨을 들이마시는 3초 동안:
+  //    - 가슴이 아주 천천히 살짝 앞으로 나옵니다.
+  //    - 배가 아주 살짝 부풀어 오릅니다.
+  //    - 양쪽 어깨가 아주 조금 올라갑니다.
+  // 3. 1초간 움직임을 멈추고 편안하게 유지합니다.
+  // 4. 입으로 4초 동안 천천히 “후~” 내쉽니다.
+  // 5. 내쉬는 동안:
+  //    - 가슴이 천천히 원래 위치로 돌아옵니다.
+  //    - 배가 천천히 원래 크기로 돌아옵니다.
+  //    - 어깨가 부드럽게 내려옵니다.
+  //    - 입 모양이 ‘후~’ 모양으로 자연스럽게 변합니다.
+  // 6. 위 동작을 2회 반복합니다.
+  //
+  // 가슴 + 배 + 어깨 + 입 네 부분이 함께 움직이며, 화면 설명 문구와 1:1로 일치합니다.
+  // --------------------------------------------------------------------------
   startBreathingExerciseMotion() {
     this.clearAllRigMotions();
     const svg = document.getElementById('kongiRigSvg');
+    const head = document.getElementById('kongiHeadGroup');
     const torso = document.getElementById('torsoGroup');
     const leftArm = document.getElementById('leftArmGroup');
     const rightArm = document.getElementById('rightArmGroup');
+    const promptEl = document.getElementById('actionPromptText');
+    const guideEl = document.getElementById('actionGuideText');
+
     if (!svg || !torso) return;
 
     svg.classList.add('is-breathing-active');
@@ -268,84 +295,144 @@ const KongiExerciseRoom = {
       this.neckSequenceTimeouts.push(tid);
     };
 
-    // 1. 인사 발화 (0s)
+    // 0. 초기 상태: 의자에 안정적으로 앉아 정면 응시
+    if (torso) {
+      torso.style.transition = 'transform 0.5s ease-out';
+      torso.style.transform = 'translateY(0) scale(1, 1)';
+    }
+    if (head) {
+      head.style.transition = 'transform 0.5s ease-out';
+      head.style.transform = 'translateY(0) rotate(0deg)';
+    }
+    if (leftArm) {
+      leftArm.style.transition = 'transform 0.5s ease-out';
+      leftArm.style.transform = 'translateY(0) rotate(0deg)';
+    }
+    if (rightArm) {
+      rightArm.style.transition = 'transform 0.5s ease-out';
+      rightArm.style.transform = 'translateY(0) rotate(0deg)';
+    }
+    svg.setAttribute('data-mouth', 'smile');
+
+    // 1. 인사 안내 (0.0s): "안녕하세요. 콩이예요."
+    if (promptEl) promptEl.textContent = '"안녕하세요. 콩이예요."';
+    if (guideEl) guideEl.textContent = '의자에 등을 편안히 기대고 안정적으로 바르게 앉습니다.';
     this.speak("안녕하세요. 콩이예요.");
 
-    // 2. 들이마시기 안내 발화 (2.2s)
+    // 2. 호흡 준비 안내 (2.2s): "의자에 등을 편안히 기대고, 코로 숨을 천천히 들이쉬어 볼까요?"
     schedule(() => {
       if (this.isPaused) return;
-      this.speak("의자에 등을 편안히 기대고, 코로 숨을 깊게 들이쉬어 볼까요?");
+      if (promptEl) promptEl.textContent = '"의자에 등을 편안히 기대고, 코로 숨을 천천히 들이쉬어 볼까요?"';
+      if (guideEl) guideEl.textContent = '코로 숨을 천천히 깊게 들이마실 준비를 합니다.';
+      this.speak("의자에 등을 편안히 기대고, 코로 숨을 천천히 들이쉬어 볼까요?");
     }, 2200);
 
-    // 단일 호흡 사이클 실행 함수 (들이마시기 3초 -> 멈추기 1초 -> 내쉬기 4초)
-    const runBreathCycle = (cycleIndex, delayStartMs, isFirstCycle = false) => {
+    // 단일 호흡 사이클 실행 함수
+    // 3초 들이마시기 -> 1초 멈추기 -> 4초 '후~' 내쉬기
+    const executeBreathCycle = (baseTime, isFirstCycle) => {
+      // (1) 코로 숨 들이마시기 (3초)
       schedule(() => {
         if (this.isPaused) return;
+        if (promptEl) promptEl.textContent = isFirstCycle ? '"코로 숨을 천천히 깊게 들이마셔 보세요."' : '"다시 한번 코로 숨을 깊게 들이마십니다."';
+        if (guideEl) guideEl.textContent = '【숨 들이쉬기 (3초)】 가슴과 배가 살짝 부풀고, 양 어깨가 천천히 올라갑니다.';
 
-        // [동작 1] 코로 숨을 천천히 들이마실 때 (3초)
-        // - 가슴과 배가 아주 살짝 부풀어 오름 (과장 금지)
-        // - 양쪽 어깨가 아주 조금 올라감
-        torso.style.transform = 'scale(1.025, 1.035)';
-        if (leftArm && rightArm) {
-          leftArm.style.transform = 'translateY(-7px) rotate(1.2deg)';
-          rightArm.style.transform = 'translateY(-7px) rotate(-1.2deg)';
+        // 가슴, 배, 어깨, 머리 3초 전환
+        if (torso) {
+          torso.style.transition = 'transform 3.0s cubic-bezier(0.25, 0.8, 0.25, 1)';
+          torso.style.transform = 'translateY(-5px) scale(1.028, 1.038)';
+        }
+        if (leftArm) {
+          leftArm.style.transition = 'transform 3.0s cubic-bezier(0.25, 0.8, 0.25, 1)';
+          leftArm.style.transform = 'translateY(-6px) rotate(1.2deg)';
+        }
+        if (rightArm) {
+          rightArm.style.transition = 'transform 3.0s cubic-bezier(0.25, 0.8, 0.25, 1)';
+          rightArm.style.transform = 'translateY(-6px) rotate(-1.2deg)';
+        }
+        if (head) {
+          head.style.transition = 'transform 3.0s cubic-bezier(0.25, 0.8, 0.25, 1)';
+          head.style.transform = 'translateY(-3px)';
         }
         svg.setAttribute('data-mouth', 'smile');
 
-        // 눈 자연스럽게 한 번 깜빡임 (들이마시는 중간 1.2초 지점)
+        // 눈 깜빡임 (들이마시는 중간 1.4초 지점)
         schedule(() => {
           if (this.isPaused) return;
           svg.classList.add('is-blinking');
           setTimeout(() => svg.classList.remove('is-blinking'), 160);
-        }, 1200);
+        }, 1400);
+      }, baseTime);
 
-        // [동작 2] 1초 정도 편안하게 유지 (3.0초 ~ 4.0초)
-        schedule(() => {
-          if (this.isPaused) return;
-          // 부풀어 오른 가슴과 올라간 어깨 1초간 유지
-        }, 3000);
+      // (2) 1초간 멈추기 (1초)
+      schedule(() => {
+        if (this.isPaused) return;
+        if (promptEl) promptEl.textContent = '"숨을 가만히 1초간 멈추고 편안하게 유지해 보세요."';
+        if (guideEl) guideEl.textContent = '【1초 멈추기 (1초)】 숨을 멈추고 가슴과 어깨를 편안하게 유지합니다.';
+        // 1초 동안 가슴, 배, 어깨 그대로 유지
+      }, baseTime + 3000);
 
-        // [동작 3] 입으로 천천히 숨을 내쉴 때 (4초, 4.0초 ~ 8.0초)
-        schedule(() => {
-          if (this.isPaused) return;
+      // (3) 입으로 4초 동안 천천히 "후~" 내쉬기
+      schedule(() => {
+        if (this.isPaused) return;
+        if (isFirstCycle) {
+          if (promptEl) promptEl.textContent = '"좋아요. 이제 입으로 천천히 후~ 내쉬어 볼게요."';
+          this.speak("좋아요. 이제 입으로 천천히 후~ 내쉬어 볼게요.", () => {
+            if (svg && !this.isPaused) svg.setAttribute('data-mouth', 'exhale');
+          });
+        } else {
+          if (promptEl) promptEl.textContent = '"입으로 천천히 후~ 길게 내쉬어 줍니다."';
+        }
+        if (guideEl) guideEl.textContent = '【후~ 내쉬기 (4초)】 입 모양을 \'후~\' 모으며 가슴·배·어깨가 원래대로 내려옵니다.';
 
-          // 첫 번째 사이클일 때 내쉬기 안내 음성 출력
-          if (isFirstCycle) {
-            this.speak("좋아요. 이제 입으로 천천히 후~ 내쉬어 볼게요.", () => {
-              // 발화 직후 '후~' 입 모양으로 즉시 복귀
-              if (svg) svg.setAttribute('data-mouth', 'exhale');
-            });
-          }
+        // 입 모양을 '후~' 모양으로 전환
+        svg.setAttribute('data-mouth', 'exhale');
 
-          // 입 모양이 자연스럽게 '후~' 모양으로 변함
-          svg.setAttribute('data-mouth', 'exhale');
+        // 가슴, 배, 어깨, 머리 4초 동안 천천히 제자리 복귀
+        if (torso) {
+          torso.style.transition = 'transform 4.0s cubic-bezier(0.25, 0.8, 0.25, 1)';
+          torso.style.transform = 'translateY(0) scale(1, 1)';
+        }
+        if (leftArm) {
+          leftArm.style.transition = 'transform 4.0s cubic-bezier(0.25, 0.8, 0.25, 1)';
+          leftArm.style.transform = 'translateY(0) rotate(0deg)';
+        }
+        if (rightArm) {
+          rightArm.style.transition = 'transform 4.0s cubic-bezier(0.25, 0.8, 0.25, 1)';
+          rightArm.style.transform = 'translateY(0) rotate(0deg)';
+        }
+        if (head) {
+          head.style.transition = 'transform 4.0s cubic-bezier(0.25, 0.8, 0.25, 1)';
+          head.style.transform = 'translateY(0)';
+        }
+      }, baseTime + 4000);
 
-          // 가슴과 배가 천천히 원래 위치로 돌아옴
-          torso.style.transform = 'scale(1, 1)';
-          // 어깨도 천천히 내려옴
-          if (leftArm && rightArm) {
-            leftArm.style.transform = 'translateY(0) rotate(0deg)';
-            rightArm.style.transform = 'translateY(0) rotate(0deg)';
-          }
-        }, 4000);
-
-        // 내쉬기 완료 후 미소 복귀 (8.0초 지점)
-        schedule(() => {
-          if (this.isPaused) return;
-          svg.setAttribute('data-mouth', 'smile');
-        }, 8000);
-
-      }, delayStartMs);
+      // (4) 사이클 종료 및 미소 복귀
+      schedule(() => {
+        if (this.isPaused) return;
+        svg.setAttribute('data-mouth', 'smile');
+      }, baseTime + 8000);
     };
 
-    // 1회차 호흡 사이클 (6.8초 지점에서 시작)
-    runBreathCycle(1, 6800, true);
+    // 1회차 호흡 사이클 (5.8s 시작 -> 13.8s 완료)
+    executeBreathCycle(5800, true);
 
-    // 2회차 호흡 사이클 (16.0초 지점에서 시작)
-    runBreathCycle(2, 16000, false);
+    // 1회차 완료 안내 (13.8s ~ 15.5s)
+    schedule(() => {
+      if (this.isPaused) return;
+      if (promptEl) promptEl.textContent = '"참 잘하셨어요. 한 번 더 천천히 해볼게요."';
+      if (guideEl) guideEl.textContent = '잠시 편안하게 숨을 고르고 2번째 호흡을 준비합니다.';
+    }, 13800);
 
-    // 3회차 호흡 사이클 (25.0초 지점에서 시작)
-    runBreathCycle(3, 25000, false);
+    // 2회차 호흡 사이클 (15.5s 시작 -> 23.5s 완료)
+    executeBreathCycle(15500, false);
+
+    // 2회 완료 및 마무리 칭찬 (23.8s)
+    schedule(() => {
+      if (this.isPaused) return;
+      if (promptEl) promptEl.textContent = '"아주 잘하셨어요. 온몸이 한결 편안해지셨죠?"';
+      if (guideEl) guideEl.textContent = '깊고 고른 호흡으로 마음과 몸이 편안해졌습니다.';
+      this.speak("아주 잘하셨어요. 온몸이 한결 편안해지셨죠?");
+    }, 23800);
   },
 
   // --------------------------------------------------------------------------
