@@ -550,8 +550,40 @@ body {
   display: block !important;
 }
 .kongi-rig-svg[data-mouth="talk-o"] .mouth-smile,
-.kongi-rig-svg[data-mouth="talk-o"] .mouth-talk-a {
+.kongi-rig-svg[data-mouth="talk-o"] .mouth-talk-a,
+.kongi-rig-svg[data-mouth="talk-o"] .mouth-exhale {
   display: none !important;
+}
+
+/* 7. 숨을 천천히 내쉴 때 '후~' 모양 입 (Exhale) */
+.kongi-rig-svg[data-mouth="exhale"] .mouth-exhale {
+  display: block !important;
+  animation: exhaleBreathPulse 3.8s ease-in-out;
+}
+.kongi-rig-svg[data-mouth="exhale"] .mouth-smile,
+.kongi-rig-svg[data-mouth="exhale"] .mouth-talk-a,
+.kongi-rig-svg[data-mouth="exhale"] .mouth-talk-o {
+  display: none !important;
+}
+
+@keyframes exhaleBreathPulse {
+  0% { opacity: 0.6; transform: scale(0.9); }
+  25% { opacity: 1; transform: scale(1.04); }
+  75% { opacity: 0.9; transform: scale(1.02); }
+  100% { opacity: 0.5; transform: scale(0.95); }
+}
+
+/* 1단계 정밀 호흡 모션 진행 시 (가슴/배 팽창 및 어깨 독립 제어) */
+.kongi-rig-svg.is-breathing-active .joint-torso {
+  animation: none !important;
+  transition: transform 3.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
+}
+
+.kongi-rig-svg.is-breathing-active .joint-arm-left,
+.kongi-rig-svg.is-breathing-active .joint-arm-right {
+  transition: transform 3.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
 }
 
 /* 일시 정지 오버레이 */

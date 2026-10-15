@@ -378,6 +378,17 @@
                 <ellipse cx="300" cy="182" rx="14" ry="12" fill="#5A1A1A" stroke="#4A2612" stroke-width="3.5"/>
                 <ellipse cx="300" cy="186" rx="8" ry="6" fill="#FF708F"/>
               </g>
+              <!-- 4. 숨 내쉴 때 자연스러운 '후~' 입 모양 (Exhale) -->
+              <g class="mouth-state mouth-exhale" style="display: none;">
+                <!-- 둥글게 오므린 입술 -->
+                <circle cx="300" cy="180" r="9" fill="#5A1A1A" stroke="#4A2612" stroke-width="3.5"/>
+                <circle cx="300" cy="180" r="5" fill="#FF708F"/>
+                <!-- 입술 오므림 주름선 -->
+                <path d="M 290 177 Q 300 173 310 177" fill="none" stroke="#4A2612" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- 부드럽게 퍼져나가는 숨결 기류 표현 -->
+                <path d="M 314 179 Q 324 175 334 179" fill="none" stroke="rgba(255, 255, 255, 0.75)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M 315 183 Q 323 186 331 183" fill="none" stroke="rgba(255, 255, 255, 0.55)" stroke-width="2.2" stroke-linecap="round"/>
+              </g>
             </g>
 
           </g>

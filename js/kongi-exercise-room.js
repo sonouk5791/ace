@@ -32,8 +32,8 @@ const KongiExerciseRoom = {
     prep: {
       name: "준비운동 (천천히 깊게 호흡하기)",
       actionTitle: "🌸 1단계: 천천히 깊게 호흡하기",
-      speech: "안녕하세요, 콩이예요. 의자에 등을 편안히 기대고, 코로 숨을 깊게 들이쉬고 입으로 천천히 후~ 내쉬어 볼까요?",
-      guide: "의자에 편안하게 앉아 코로 숨을 들이쉬고 입으로 천천히 내쉽니다.",
+      speech: "안녕하세요. 콩이예요. 의자에 등을 편안히 기대고, 코로 숨을 깊게 들이쉬어 볼까요?",
+      guide: "코로 숨을 천천히 들이마셨다가, 1초 멈추고, 입으로 천천히 후~ 내쉽니다.",
       duration: 35,
       motionType: "breath"
     },
@@ -199,7 +199,7 @@ const KongiExerciseRoom = {
     this.isTalking = false;
     if (this.lipSyncInterval) clearInterval(this.lipSyncInterval);
     const svg = document.getElementById('kongiRigSvg');
-    if (svg) {
+    if (svg && svg.getAttribute('data-mouth') !== 'exhale') {
       svg.setAttribute('data-mouth', 'smile');
     }
   },
@@ -209,33 +209,147 @@ const KongiExerciseRoom = {
     this.neckSequenceTimeouts.forEach(t => clearTimeout(t));
     this.neckSequenceTimeouts = [];
 
+    const svg = document.getElementById('kongiRigSvg');
     const head = document.getElementById('kongiHeadGroup');
     const leftEar = document.getElementById('leftEarGroup');
     const rightEar = document.getElementById('rightEarGroup');
+    const torso = document.getElementById('torsoGroup');
     const leftArm = document.getElementById('leftArmGroup');
     const rightArm = document.getElementById('rightArmGroup');
     const leftLeg = document.getElementById('leftLegGroup');
     const rightLeg = document.getElementById('rightLegGroup');
 
+    if (svg) {
+      svg.classList.remove('is-breathing-active');
+      svg.setAttribute('data-mouth', 'smile');
+    }
     if (head) head.style.transform = 'rotate(0deg)';
     if (leftEar) leftEar.style.transform = 'rotate(0deg)';
     if (rightEar) rightEar.style.transform = 'rotate(0deg)';
-    if (leftArm) leftArm.style.transform = 'rotate(0deg)';
-    if (rightArm) rightArm.style.transform = 'rotate(0deg)';
+    if (torso) torso.style.transform = 'scale(1, 1)';
+    if (leftArm) leftArm.style.transform = 'translateY(0) rotate(0deg)';
+    if (rightArm) rightArm.style.transform = 'translateY(0) rotate(0deg)';
     if (leftLeg) leftLeg.style.transform = 'rotate(0deg)';
     if (rightLeg) rightLeg.style.transform = 'rotate(0deg)';
   },
 
   // --------------------------------------------------------------------------
+  // [1단계: 천천히 깊게 호흡하기] 핵심 호흡 모션 시퀀서
+  // - 캐릭터는 의자에 편안하게 착석 (의자/엉덩이 완전 고정)
+  // 1. 코로 숨을 천천히 들이마실 때 (약 3초):
+  //    - 가슴과 배가 아주 살짝 부풀어 오름 (과장 금지, scale 1.025~1.035)
+  //    - 양쪽 어깨가 아주 조금 올라감 (translateY -7px)
+  //    - 눈은 편안하게 뜨거나 자연스럽게 한 번 깜빡임
+  // 2. 1초 정도 편안하게 유지
+  // 3. 입으로 천천히 숨을 내쉴 때 (약 4초):
+  //    - 입 모양이 자연스럽게 '후~' 모양(exhale)으로 변함
+  //    - 가슴과 배가 천천히 원래 위치로 돌아옴 (scale 1, 1)
+  //    - 어깨도 천천히 내려옴 (translateY 0)
+  // 4. 이 동작을 2~3회 반복
+  // 한국어 음성 3단계 안내 연동:
+  // "안녕하세요. 콩이예요."
+  // "의자에 등을 편안히 기대고, 코로 숨을 깊게 들이쉬어 볼까요?"
+  // "좋아요. 이제 입으로 천천히 후~ 내쉬어 볼게요."
+  // --------------------------------------------------------------------------
+  startBreathingExerciseMotion() {
+    this.clearAllRigMotions();
+    const svg = document.getElementById('kongiRigSvg');
+    const torso = document.getElementById('torsoGroup');
+    const leftArm = document.getElementById('leftArmGroup');
+    const rightArm = document.getElementById('rightArmGroup');
+    if (!svg || !torso) return;
+
+    svg.classList.add('is-breathing-active');
+
+    const schedule = (fn, delayMs) => {
+      const tid = setTimeout(() => {
+        if (!this.isPaused) fn();
+      }, delayMs);
+      this.neckSequenceTimeouts.push(tid);
+    };
+
+    // 1. 인사 발화 (0s)
+    this.speak("안녕하세요. 콩이예요.");
+
+    // 2. 들이마시기 안내 발화 (2.2s)
+    schedule(() => {
+      if (this.isPaused) return;
+      this.speak("의자에 등을 편안히 기대고, 코로 숨을 깊게 들이쉬어 볼까요?");
+    }, 2200);
+
+    // 단일 호흡 사이클 실행 함수 (들이마시기 3초 -> 멈추기 1초 -> 내쉬기 4초)
+    const runBreathCycle = (cycleIndex, delayStartMs, isFirstCycle = false) => {
+      schedule(() => {
+        if (this.isPaused) return;
+
+        // [동작 1] 코로 숨을 천천히 들이마실 때 (3초)
+        // - 가슴과 배가 아주 살짝 부풀어 오름 (과장 금지)
+        // - 양쪽 어깨가 아주 조금 올라감
+        torso.style.transform = 'scale(1.025, 1.035)';
+        if (leftArm && rightArm) {
+          leftArm.style.transform = 'translateY(-7px) rotate(1.2deg)';
+          rightArm.style.transform = 'translateY(-7px) rotate(-1.2deg)';
+        }
+        svg.setAttribute('data-mouth', 'smile');
+
+        // 눈 자연스럽게 한 번 깜빡임 (들이마시는 중간 1.2초 지점)
+        schedule(() => {
+          if (this.isPaused) return;
+          svg.classList.add('is-blinking');
+          setTimeout(() => svg.classList.remove('is-blinking'), 160);
+        }, 1200);
+
+        // [동작 2] 1초 정도 편안하게 유지 (3.0초 ~ 4.0초)
+        schedule(() => {
+          if (this.isPaused) return;
+          // 부풀어 오른 가슴과 올라간 어깨 1초간 유지
+        }, 3000);
+
+        // [동작 3] 입으로 천천히 숨을 내쉴 때 (4초, 4.0초 ~ 8.0초)
+        schedule(() => {
+          if (this.isPaused) return;
+
+          // 첫 번째 사이클일 때 내쉬기 안내 음성 출력
+          if (isFirstCycle) {
+            this.speak("좋아요. 이제 입으로 천천히 후~ 내쉬어 볼게요.", () => {
+              // 발화 직후 '후~' 입 모양으로 즉시 복귀
+              if (svg) svg.setAttribute('data-mouth', 'exhale');
+            });
+          }
+
+          // 입 모양이 자연스럽게 '후~' 모양으로 변함
+          svg.setAttribute('data-mouth', 'exhale');
+
+          // 가슴과 배가 천천히 원래 위치로 돌아옴
+          torso.style.transform = 'scale(1, 1)';
+          // 어깨도 천천히 내려옴
+          if (leftArm && rightArm) {
+            leftArm.style.transform = 'translateY(0) rotate(0deg)';
+            rightArm.style.transform = 'translateY(0) rotate(0deg)';
+          }
+        }, 4000);
+
+        // 내쉬기 완료 후 미소 복귀 (8.0초 지점)
+        schedule(() => {
+          if (this.isPaused) return;
+          svg.setAttribute('data-mouth', 'smile');
+        }, 8000);
+
+      }, delayStartMs);
+    };
+
+    // 1회차 호흡 사이클 (6.8초 지점에서 시작)
+    runBreathCycle(1, 6800, true);
+
+    // 2회차 호흡 사이클 (16.0초 지점에서 시작)
+    runBreathCycle(2, 16000, false);
+
+    // 3회차 호흡 사이클 (25.0초 지점에서 시작)
+    runBreathCycle(3, 25000, false);
+  },
+
+  // --------------------------------------------------------------------------
   // [2단계: 부드럽게 목 움직이기] 핵심 관절 시퀀서
-  // 1. 정면을 바라본다.
-  // 2. 고개를 오른쪽으로 천천히 기울인다. (목 관절 중심)
-  // 3. 약 2초 유지한다.
-  // 4. 천천히 중앙으로 돌아온다.
-  // 5. 고개를 왼쪽으로 천천히 기울인다. (목 관절 중심)
-  // 6. 약 2초 유지한다.
-  // 7. 다시 중앙으로 돌아온다.
-  // 매우 천천히 진행 · 엉덩이는 의자에서 떨어지지 않음 · 어깨 편안 · 정면 고정 카메라
   // --------------------------------------------------------------------------
   startNeckExerciseMotion() {
     this.clearAllRigMotions();
@@ -341,11 +455,15 @@ const KongiExerciseRoom = {
     };
 
     switch (motionType) {
+      case 'breath':
+      case 'prep':
+        this.startBreathingExerciseMotion();
+        break;
+
       case 'neck':
         this.startNeckExerciseMotion();
         break;
 
-      case 'prep':
       case 'finish':
         // 가슴 및 어깨 안정 호흡 관절 모션
         const breatheStep = () => {
@@ -520,9 +638,9 @@ const KongiExerciseRoom = {
     // 실제 신체 관절 움직임 실행 (목 운동 2단계 또는 해당 동작 모션)
     this.applyStepJointMotion(step.motionType);
 
-    // 2단계(목 운동)의 경우 startNeckExerciseMotion 내부에서 세밀한 안내 음성을 순차적으로 발화하므로,
+    // 1단계(호흡) 및 2단계(목 운동)의 경우 내부에서 세밀한 안내 음성을 순차적으로 발화하므로,
     // 다른 일반 단계인 경우에만 기본 step.speech 발화
-    if (step.motionType !== 'neck') {
+    if (step.motionType !== 'neck' && step.motionType !== 'breath' && step.motionType !== 'prep') {
       this.speak(step.speech);
     }
   },
