@@ -274,12 +274,24 @@
 
           </g>
 
-          <!-- 호환성 유지를 위한 팔/다리 리그 보조 앵커 (숨김) -->
-          <g id="pelvisLegsLayer" style="display: none;"></g>
-          <g id="leftLegGroup" style="display: none;"></g>
-          <g id="rightLegGroup" style="display: none;"></g>
-          <g id="leftArmGroup" style="display: none;"></g>
-          <g id="rightArmGroup" style="display: none;"></g>
+          <!-- 5. 원본 콩이 양팔 파츠 (어깨 관절 중심: 앞으로 뻗기, 벌리기, 올리기, 박수 치기) -->
+          <g id="leftArmGroup" class="joint-arm-left" style="transform-origin: 200px 340px;">
+            <image href="assets/images/kongi-parts/kongi_arm_left_paw.png" x="165" y="115" width="270" height="354" preserveAspectRatio="xMidYMid meet" />
+          </g>
+          <g id="rightArmGroup" class="joint-arm-right" style="transform-origin: 400px 340px;">
+            <image href="assets/images/kongi-parts/kongi_arm_right_paw.png" x="165" y="115" width="270" height="354" preserveAspectRatio="xMidYMid meet" />
+          </g>
+
+          <!-- 6. 원본 콩이 양다리 파츠 (무릎 살짝 들기/내리기, 엉덩이와 의자는 고정) -->
+          <g id="leftLegGroup" class="joint-leg-left" style="transform-origin: 260px 415px;">
+            <image href="assets/images/kongi-parts/kongi_leg_left.png" x="165" y="115" width="270" height="354" preserveAspectRatio="xMidYMid meet" />
+          </g>
+          <g id="rightLegGroup" class="joint-leg-right" style="transform-origin: 340px 415px;">
+            <image href="assets/images/kongi-parts/kongi_leg_right.png" x="165" y="115" width="270" height="354" preserveAspectRatio="xMidYMid meet" />
+          </g>
+
+          <g id="leftHandGroup" style="display: none;"></g>
+          <g id="rightHandGroup" style="display: none;"></g>
           <g id="leftEarGroup" style="display: none;"></g>
           <g id="rightEarGroup" style="display: none;"></g>
         </svg>

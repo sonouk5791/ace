@@ -488,36 +488,30 @@ body {
   transition: transform 3.5s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* 3. 어깨 & 팔 관절 (Shoulders & Arms) */
+/* 3. 어깨 & 팔 관절 (Shoulders & Arms) - 원본 콩이 양팔 어깨 피벗 */
 .joint-arm-left {
-  transform-origin: 225px 230px;
-  transition: transform 2.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-origin: 200px 340px;
+  transition: transform 2.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
 }
 
 .joint-arm-right {
-  transform-origin: 375px 230px;
-  transition: transform 2.8s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.joint-hand-left {
-  transform-origin: 198px 335px;
+  transform-origin: 400px 340px;
   transition: transform 2.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
 }
 
-.joint-hand-right {
-  transform-origin: 402px 335px;
-  transition: transform 2.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-/* 4. 무릎 및 다리 관절 (Legs & Knees) - 엉덩이는 의자에 고정 */
+/* 4. 무릎 및 다리 관절 (Legs & Knees) - 엉덩이는 의자에 완전 고정 */
 .joint-leg-left {
-  transform-origin: 240px 370px;
-  transition: transform 2.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-origin: 260px 415px;
+  transition: transform 2.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
 }
 
 .joint-leg-right {
-  transform-origin: 360px 370px;
-  transition: transform 2.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-origin: 340px 415px;
+  transition: transform 2.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
 }
 
 /* 5. 눈 깜빡임 (Natural Blinking & Smiling) */

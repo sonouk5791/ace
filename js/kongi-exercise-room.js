@@ -505,38 +505,57 @@ const KongiExerciseRoom = {
         break;
 
       case 'arm':
-        // 4단계: 팔 앞으로 뻗고 당기기
-        const armStep = () => {
-          if (leftArm && rightArm) {
-            leftArm.style.transform = 'rotate(-10deg) scale(1.04)';
-            rightArm.style.transform = 'rotate(10deg) scale(1.04)';
-          }
+        // 4단계: 팔 운동 (팔 앞으로 뻗기 -> 옆으로 벌리기 -> 천천히 올리기 -> 박수 치기)
+        const runArmWorkout = () => {
+          if (!leftArm || !rightArm) return;
+          // 1. 팔 앞으로 뻗기
+          leftArm.style.transform = 'translateY(-10px) rotate(-18deg) scale(1.05)';
+          rightArm.style.transform = 'translateY(-10px) rotate(18deg) scale(1.05)';
+
+          // 2. 팔 옆으로 벌리기 (5초 후)
           schedule(() => {
-            if (leftArm && rightArm) {
-              leftArm.style.transform = 'rotate(0deg) scale(1)';
-              rightArm.style.transform = 'rotate(0deg) scale(1)';
-            }
-          }, 3500);
+            if (this.isPaused) return;
+            leftArm.style.transform = 'translateY(-6px) rotate(-38deg)';
+            rightArm.style.transform = 'translateY(-6px) rotate(38deg)';
+          }, 5000);
+
+          // 3. 양팔 천천히 올리기 (11초 후)
+          schedule(() => {
+            if (this.isPaused) return;
+            leftArm.style.transform = 'translateY(-24px) rotate(-55deg)';
+            rightArm.style.transform = 'translateY(-24px) rotate(55deg)';
+          }, 11000);
+
+          // 4. 박수 치기 (17초 후)
+          schedule(() => {
+            if (this.isPaused) return;
+            leftArm.style.transform = 'translateX(24px) rotate(22deg)';
+            rightArm.style.transform = 'translateX(-24px) rotate(-22deg)';
+          }, 17000);
+
+          // 5. 제자리 복귀 (23초 후)
+          schedule(() => {
+            if (this.isPaused) return;
+            leftArm.style.transform = 'translateY(0) rotate(0deg) scale(1)';
+            rightArm.style.transform = 'translateY(0) rotate(0deg) scale(1)';
+          }, 23000);
         };
-        armStep();
-        schedule(armStep, 7500);
-        schedule(armStep, 15000);
-        schedule(armStep, 22500);
+        runArmWorkout();
         break;
 
       case 'finger':
         // 5단계: 손가락 및 손목 주먹 쥐고 펴기
         const fingerStep = () => {
-          if (leftHand && rightHand) {
-            leftHand.style.transform = 'rotate(10deg)';
-            rightHand.style.transform = 'rotate(-10deg)';
+          if (leftArm && rightArm) {
+            leftArm.style.transform = 'rotate(-8deg)';
+            rightArm.style.transform = 'rotate(8deg)';
           }
           schedule(() => {
-            if (leftHand && rightHand) {
-              leftHand.style.transform = 'rotate(-6deg)';
-              rightHand.style.transform = 'rotate(6deg)';
+            if (leftArm && rightArm) {
+              leftArm.style.transform = 'rotate(0deg)';
+              rightArm.style.transform = 'rotate(0deg)';
             }
-          }, 2000);
+          }, 2200);
         };
         fingerStep();
         schedule(fingerStep, 4500);
@@ -546,21 +565,33 @@ const KongiExerciseRoom = {
         break;
 
       case 'knee':
-        // 6단계: 의자에서 무릎 살짝 들기 (엉덩이는 의자에 완전히 고정)
-        const kneeStep = () => {
-          if (leftLeg) {
-            leftLeg.style.transform = 'translateY(-10px) rotate(-3deg)';
-          }
+        // 6단계: 의자에서 무릎 살짝 들기 (왼쪽 무릎 들기/내리기 -> 오른쪽 무릎 들기/내리기, 엉덩이/의자 완전 고정)
+        const rightLegEl = document.getElementById('rightLegGroup');
+        const runKneeWorkout = () => {
+          // 1. 왼쪽 무릎 천천히 들기
+          if (leftLeg) leftLeg.style.transform = 'translateY(-16px) rotate(-3deg)';
+
+          // 2. 왼쪽 무릎 내리기 (3.5초 후)
           schedule(() => {
-            if (leftLeg) {
-              leftLeg.style.transform = 'translateY(0) rotate(0deg)';
-            }
-          }, 3200);
+            if (this.isPaused) return;
+            if (leftLeg) leftLeg.style.transform = 'translateY(0) rotate(0deg)';
+          }, 3500);
+
+          // 3. 오른쪽 무릎 천천히 들기 (7초 후)
+          schedule(() => {
+            if (this.isPaused) return;
+            if (rightLegEl) rightLegEl.style.transform = 'translateY(-16px) rotate(3deg)';
+          }, 7000);
+
+          // 4. 오른쪽 무릎 내리기 (10.5초 후)
+          schedule(() => {
+            if (this.isPaused) return;
+            if (rightLegEl) rightLegEl.style.transform = 'translateY(0) rotate(0deg)';
+          }, 10500);
         };
-        kneeStep();
-        schedule(kneeStep, 7000);
-        schedule(kneeStep, 14000);
-        schedule(kneeStep, 21000);
+        runKneeWorkout();
+        schedule(runKneeWorkout, 15000);
+        schedule(runKneeWorkout, 28000);
         break;
 
       case 'ankle':
