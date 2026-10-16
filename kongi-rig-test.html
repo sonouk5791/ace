@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Kongi Authentic Rig Test</title>
+  <style>
+    body { background: #FAF7F2; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: sans-serif; }
+    .theater { width: 600px; height: 520px; background: #FFF9F2; border: 3px solid #FED7AA; border-radius: 24px; position: relative; overflow: hidden; }
+    svg { width: 100%; height: 100%; }
+    .controls { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: 700px; }
+    button { padding: 10px 18px; font-size: 16px; font-weight: bold; border-radius: 12px; border: 1px solid #ccc; background: white; cursor: pointer; }
+    button:hover { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+
+<h1>🐶 원본 콩이 (안경+노란 운동복) 관절 리그 테스트</h1>
+
+<div class="theater">
+  <svg id="testRig" viewBox="150 100 954 1140" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+        <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#553010" flood-opacity="0.12"/>
+      </filter>
+    </defs>
+
+    <!-- 1. 바닥 그림자 -->
+    <ellipse cx="627" cy="1205" rx="340" ry="32" fill="rgba(80, 50, 20, 0.16)"/>
+
+    <!-- 2. 의자 (Chair) - 바닥과 의자는 절대 흔들리지 않고 100% 완전 고정 -->
+    <g id="chairLayer">
+      <!-- 의자 등받이 원목 프레임 -->
+      <rect x="360" y="440" width="534" height="480" rx="40" fill="#B3783D" stroke="#875421" stroke-width="12"/>
+      <rect x="395" y="475" width="464" height="410" rx="30" fill="#759A7A" stroke="#56785A" stroke-width="8"/>
+      <!-- 의자 좌판 쿠션 (안정된 세이지 그린 쿠션) -->
+      <path d="M 320 950 Q 627 980 934 950 L 950 1020 Q 627 1060 304 1020 Z" fill="#6B9171" stroke="#4C6E52" stroke-width="10"/>
+      <!-- 의자 팔걸이 (좌우) -->
+      <rect x="290" y="780" width="50" height="230" rx="20" fill="#B3783D" stroke="#875421" stroke-width="10"/>
+      <rect x="914" y="780" width="50" height="230" rx="20" fill="#B3783D" stroke="#875421" stroke-width="10"/>
+      <!-- 의자 다리 4개 -->
+      <rect x="340" y="1020" width="42" height="180" rx="14" fill="#875421"/>
+      <rect x="872" y="1020" width="42" height="180" rx="14" fill="#875421"/>
+    </g>
+
+    <!-- 3. 하체 및 엉덩이 (의자에 완전 고정) -->
+    <g id="hipsGroup">
+      <image href="assets/images/kongi-parts/rig/kongi_hips.png" x="0" y="0" width="1254" height="1254"/>
+    </g>
+
+    <!-- 4. 다리 파츠 (무릎 살짝 들기, 발목 까딱까딱) -->
+    <g id="legLeftGroup" style="transform-origin: 535px 1040px; transition: transform 0.6s ease;">
+      <image href="assets/images/kongi-parts/rig/kongi_leg_left.png" x="0" y="0" width="1254" height="1254"/>
+    </g>
+    <g id="legRightGroup" style="transform-origin: 715px 1040px; transition: transform 0.6s ease;">
+      <image href="assets/images/kongi-parts/rig/kongi_leg_right.png" x="0" y="0" width="1254" height="1254"/>
+    </g>
+
+    <!-- 5. 몸통 (Torso) - 호흡 시 가슴/배만 미세 팽창, 엉덩이는 고정 -->
+    <g id="torsoGroup" style="transform-origin: 627px 960px; transition: transform 0.8s ease;">
+      <image href="assets/images/kongi-parts/rig/kongi_torso.png" x="0" y="0" width="1254" height="1254"/>
+    </g>
+
+    <!-- 6. 양팔 (Shoulders & Arms) - 어깨 관절 독립 피벗 -->
+    <g id="armLeftGroup" style="transform-origin: 435px 715px; transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);">
+      <image href="assets/images/kongi-parts/rig/kongi_arm_left_straight.png" x="0" y="0" width="1254" height="1254"/>
+    </g>
+    <g id="armRightGroup" style="transform-origin: 825px 715px; transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);">
+      <image href="assets/images/kongi-parts/rig/kongi_arm_right.png" x="0" y="0" width="1254" height="1254"/>
+    </g>
+
+    <!-- 7. 머리 그룹 (Head Group) - 목 관절 (627px, 675px) 기준 기울임 -->
+    <g id="headGroup" style="transform-origin: 627px 675px; transition: transform 0.8s ease;">
+      <image href="assets/images/kongi-parts/rig/kongi_head.png" x="0" y="0" width="1254" height="1254"/>
+      
+      <!-- 눈 깜빡임 오버레이 -->
+      <image id="blinkOverlay" href="assets/images/kongi-parts/rig/kongi_eyes_blink.png" x="0" y="0" width="1254" height="1254" style="display: none;"/>
+
+      <!-- 입모양 오버레이 -->
+      <image id="mouthExhale" href="assets/images/kongi-parts/rig/kongi_mouth_exhale.png" x="0" y="0" width="1254" height="1254" style="display: none;"/>
+      <image id="mouthA" href="assets/images/kongi-parts/rig/kongi_mouth_a.png" x="0" y="0" width="1254" height="1254" style="display: none;"/>
+      <image id="mouthO" href="assets/images/kongi-parts/rig/kongi_mouth_o.png" x="0" y="0" width="1254" height="1254" style="display: none;"/>
+      <image id="mouthI" href="assets/images/kongi-parts/rig/kongi_mouth_i.png" x="0" y="0" width="1254" height="1254" style="display: none;"/>
+    </g>
+  </svg>
+</div>
+
+<div class="controls">
+  <button onclick="setPose('reset')">기본 자세 (제자리)</button>
+  <button onclick="setPose('breathe')">1. 호흡 (숨쉬기 / 후~)</button>
+  <button onclick="setPose('neck')">2. 목 숙이기 (좌우)</button>
+  <button onclick="setPose('shoulder')">3. 어깨 으쓱으쓱</button>
+  <button onclick="setPose('arms_up')">4-1. 팔 위로 올리기</button>
+  <button onclick="setPose('arms_side')">4-2. 팔 좌우 뻗기</button>
+  <button onclick="setPose('arms_clap')">4-3. 손뼉 짝짝 마주치기</button>
+  <button onclick="setPose('knee_left')">5. 왼쪽 무릎 들기</button>
+  <button onclick="setPose('knee_right')">6. 오른쪽 무릎 들기</button>
+  <button onclick="setPose('ankle')">7. 발끝 들고 발목 까딱까딱</button>
+  <button onclick="setPose('blink')">눈 깜빡이기</button>
+  <button onclick="setPose('talk')">입모양 (립싱크)</button>
+</div>
+
+<script>
+  const head = document.getElementById('headGroup');
+  const torso = document.getElementById('torsoGroup');
+  const armL = document.getElementById('armLeftGroup');
+  const armR = document.getElementById('armRightGroup');
+  const legL = document.getElementById('legLeftGroup');
+  const legR = document.getElementById('legRightGroup');
+  const blink = document.getElementById('blinkOverlay');
+  const exhale = document.getElementById('mouthExhale');
+  const mouthA = document.getElementById('mouthA');
+  const mouthO = document.getElementById('mouthO');
+  const mouthI = document.getElementById('mouthI');
+
+  function hideMouths() {
+    exhale.style.display = 'none';
+    mouthA.style.display = 'none';
+    mouthO.style.display = 'none';
+    mouthI.style.display = 'none';
+  }
+
+  function setPose(pose) {
+    hideMouths();
+    blink.style.display = 'none';
+
+    if (pose === 'reset') {
+      head.style.transform = 'rotate(0deg)';
+      torso.style.transform = 'scale(1, 1)';
+      armL.style.transform = 'rotate(0deg) translate(0, 0)';
+      armR.style.transform = 'rotate(0deg) translate(0, 0)';
+      legL.style.transform = 'rotate(0deg) translate(0, 0)';
+      legR.style.transform = 'rotate(0deg) translate(0, 0)';
+      legL.style.transformOrigin = '535px 1040px';
+      legR.style.transformOrigin = '715px 1040px';
+    } else if (pose === 'breathe') {
+      torso.style.transform = 'translateY(-14px) scale(1.025, 1.035)';
+      armL.style.transform = 'translateY(-16px) rotate(2deg)';
+      armR.style.transform = 'translateY(-16px) rotate(-2deg)';
+      setTimeout(() => {
+        exhale.style.display = 'block';
+        torso.style.transform = 'scale(1, 1)';
+        armL.style.transform = 'rotate(0deg) translate(0, 0)';
+        armR.style.transform = 'rotate(0deg) translate(0, 0)';
+        setTimeout(hideMouths, 2500);
+      }, 2000);
+    } else if (pose === 'neck') {
+      head.style.transform = 'rotate(13deg)';
+      setTimeout(() => {
+        head.style.transform = 'rotate(-13deg)';
+        setTimeout(() => { head.style.transform = 'rotate(0deg)'; }, 1500);
+      }, 1500);
+    } else if (pose === 'shoulder') {
+      armL.style.transform = 'translateY(-28px) rotate(3deg)';
+      armR.style.transform = 'translateY(-28px) rotate(-3deg)';
+      setTimeout(() => {
+        armL.style.transform = 'translateY(0) rotate(0deg)';
+        armR.style.transform = 'translateY(0) rotate(0deg)';
+      }, 1800);
+    } else if (pose === 'arms_up') {
+      armL.style.transform = 'rotate(142deg)';
+      armR.style.transform = 'rotate(-142deg)';
+    } else if (pose === 'arms_side') {
+      armL.style.transform = 'rotate(72deg)';
+      armR.style.transform = 'rotate(-72deg)';
+    } else if (pose === 'arms_clap') {
+      // Clapping inward motion
+      let clapCount = 0;
+      const doClap = () => {
+        armL.style.transform = 'rotate(-32deg) translateX(45px)';
+        armR.style.transform = 'rotate(32deg) translateX(-45px)';
+        setTimeout(() => {
+          armL.style.transform = 'rotate(-24deg) translateX(25px)';
+          armR.style.transform = 'rotate(24deg) translateX(-25px)';
+          clapCount++;
+          if (clapCount < 3) setTimeout(doClap, 300);
+        }, 250);
+      };
+      doClap();
+    } else if (pose === 'knee_left') {
+      legL.style.transformOrigin = '535px 1040px';
+      legL.style.transform = 'translateY(-26px) rotate(-4deg)';
+      setTimeout(() => { legL.style.transform = 'rotate(0deg) translate(0, 0)'; }, 1800);
+    } else if (pose === 'knee_right') {
+      legR.style.transformOrigin = '715px 1040px';
+      legR.style.transform = 'translateY(-26px) rotate(4deg)';
+      setTimeout(() => { legR.style.transform = 'rotate(0deg) translate(0, 0)'; }, 1800);
+    } else if (pose === 'ankle') {
+      legL.style.transformOrigin = '535px 1185px';
+      legR.style.transformOrigin = '715px 1185px';
+      let count = 0;
+      const doAnkle = () => {
+        legL.style.transform = 'rotate(-12deg)';
+        legR.style.transform = 'rotate(12deg)';
+        setTimeout(() => {
+          legL.style.transform = 'rotate(0deg)';
+          legR.style.transform = 'rotate(0deg)';
+          count++;
+          if (count < 3) setTimeout(doAnkle, 400);
+        }, 350);
+      };
+      doAnkle();
+    } else if (pose === 'blink') {
+      blink.style.display = 'block';
+      setTimeout(() => { blink.style.display = 'none'; }, 200);
+    } else if (pose === 'talk') {
+      let step = 0;
+      const mouths = [mouthA, mouthO, mouthI, mouthA, mouthO];
+      const timer = setInterval(() => {
+        hideMouths();
+        if (step >= mouths.length) {
+          clearInterval(timer);
+          return;
+        }
+        mouths[step].style.display = 'block';
+        step++;
+      }, 180);
+    }
+  }
+</script>
+
+</body>
+</html>
